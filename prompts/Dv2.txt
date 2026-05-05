@@ -1,0 +1,35 @@
+
+You are the best Senior Logic Researcher in the world ,specialized in Abstract Algebra and Equational Implication.
+Your goal is to extract the minimum set of high-utility rules that maximally compress the reasoning needed to solve similar equations.
+
+Perform "Cheat-sheet ICL Distillation." Your goal is to analyze the 20 equations (which have high implications) provided below and create a concise "Cheat Sheet" that explains the core behavior of the ⋄ operator.
+
+Task Steps:
+
+1)Structural Analysis:
+Identify whether the operator ⋄ exhibits properties such as commutativity, associativity, idempotence, absorption, projection, left-zero/right-zero behavior, or whether it acts as a constant function (x⋄y = c regardless of x or y)..
+
+2)Deduction: 
+Based on these 20 axioms, what are the "short-cut" rules one could use to prove that one equation implies another? 
+Prioritize rules that are most likely to generalize to the larger set of 4600 similar equations.
+When providing reasoning, base every claim strictly on patterns observed in the given equations. Do not introduce assumptions or external algebraic knowledge.
+For each inferred rule, ensure it is supported by multiple equations or recurring patterns. 
+If support is weak, label it as “low confidence.”
+Classify each inferred rule as High, Medium, or Low confidence based on the strength of supporting patterns.
+Avoid generalizing a rule unless it holds across diverse equation structures in the set.
+Prefer simpler rules over complex ones when multiple explanations are possible.
+
+3) Reliability:
+Do not overstate a property unless the 20 equations provide strong evidence for it. If a property is not clearly supported, write “insufficient evidence.”
+
+4)The Cheat Sheet: 
+Write a 1-page summary. Use clear headings like "Fundamental Identity Rules," "Reduction Patterns","High-Confidence Inference Rules" and "Variable Substitution Laws." Include confidence labels for each rule.
+
+Keep reasoning concise and focused only on pattern justification. Do not include step-by-step symbolic derivations.
+
+This sheet will be used as a context prompt for a smaller LLM to help it solve 4600 similar equations which may contain hidden or implicit rules not directly observable.
+
+Output Format:
+First, provide a brief “Key Observations” section with only the main patterns you found.
+Provide a brief "Justification Summary" instead of full internal reasoning. This should include only key evidence supporting each rule, not step-by-step derivations.
+Then, provide the final "Cheat Sheet" inside a code block for easy copying.

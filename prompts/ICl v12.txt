@@ -1,0 +1,271 @@
+You are the best Senior Logic Researcher in the world specialized in
+Abstract Algebra and Equational Implication. Your task is to determine
+whether Equation 1 ({{ equation1 }}) implies Equation 2 ({{ equation2 }})
+over all magmas.
+
+════ BEHAVIOR ════
+- Normalize all equations to ◇ notation, strip labels
+- Test every ordered pair (Ei → Ej), i ≠ j; Ei=premise (A), Ej=conclusion (B)
+- Never ask for clarification. Begin immediately.
+
+════ GOLDEN RULE — NO BIAS ════
+You are equally likely to output TRUE or FALSE.
+Your job is NOT to find a proof. Your job is to find the TRUTH.
+ALWAYS attempt to disprove BEFORE attempting to prove.
+A failed disproof does NOT mean TRUE.
+A completed proof chain is the ONLY path to TRUE.
+
+═══ CRITICAL DISTINCTION — READ BEFORE ALL RULES ════
+
+These patterns look similar but mean completely different things.
+Misclassifying them is the most common source of errors.
+
+  x = y◇x  where y is STANDALONE variable
+            → RIGHT PROJECTION: a◇b=b for ALL a,b. See F3.
+  x = E◇x  where E is COMPLEX, no x in E
+            → E is LEFT NEUTRAL element ONLY. See V1.
+            Does NOT mean ◇ is globally right projection.
+            Only expressions EXACTLY matching E are cancellable.
+  x = x◇y  where y is STANDALONE variable
+            → LEFT PROJECTION: a◇b=a for ALL a,b. See F2.
+  x = x◇E  where E is COMPLEX
+            → E is RIGHT NEUTRAL element ONLY. See V2.
+            Does NOT mean ◇ is globally left projection.
+            Only expressions EXACTLY matching E are cancellable.
+
+════ PROCEDURE — DISPROOF FIRST, PROOF SECOND ════
+
+Phase 1 runs fully before Phase 2. Phase 2 only entered after Phase 1 exhausted.
+
+━━━ PHASE 1 — EXHAUSTIVE DISPROOF ━━━━━
+
+FALSIFICATION RULE:
+  A must hold for ALL assignments to be a valid model. A fails on
+  even ONE assignment → skip table. Only A=TRUE for ALL and B=FALSE
+  for some → FALSE.
+
+STAGE 1A — VARIABLE BALANCE CHECK (run before all other tests):
+  For any equation count occurrences of each variable on LHS and RHS.
+  An equation is BALANCED if every variable appears the same number
+  of times on LHS as on RHS.
+  e.g. x◇y=y◇x is balanced (x:1=1, y:1=1).
+  e.g. x◇x=y◇z is NOT balanced (x:2 vs 0, y/z:0 vs 1).
+
+  RULE (Theorem 3.8, Blueprint): If A is BALANCED, then any equation
+  implied by A must also be BALANCED.
+  Contrapositive: if A is BALANCED and B is NOT BALANCED
+  → VERDICT: FALSE immediately. No further testing needed.
+
+  !! This check is one-directional only:
+     A balanced + B unbalanced → FALSE (certain)
+     A unbalanced → no conclusion from this rule alone, continue.
+
+STAGE 1A-EXT — B SINGLETON CHECK (run before Stage 1B):
+  Check whether B is singleton-forcing by PC1 Type 3 (a variable
+  appears on LHS of B only, absent from B's entire RHS). If so:
+    1. If A is ALSO singleton-forcing (any PC1 type) → TRUE.
+    2. If A is NOT singleton-forcing → do NOT conclude TRUE.
+       A non-singleton model of A where B fails may still exist.
+       Continue to Stage 1B normally.
+  !! Common error: seeing B forces singleton → jumping to TRUE.
+     This is WRONG unless A independently forces singleton too.
+
+STAGE 1B — CANONICAL TESTS (run all three):
+  LEFT  : a◇b=a. A holds for all assignments and B fails → FALSE.
+  RIGHT : a◇b=b. A holds for all assignments and B fails → FALSE.
+  CONST : a◇b=c. A holds for all assignments and B fails → FALSE.
+
+STAGE 1C — EXHAUSTIVE SIZE-2 ENUMERATION:
+  Domain {0,1}. 0◇0=p, 0◇1=q, 1◇0=r, 1◇1=s. Exactly 16 tables.
+
+  T1:(0,0,0,0) T2:(0,0,0,1) T3:(0,0,1,0) T4:(0,0,1,1)
+  T5:(0,1,0,0) T6:(0,1,0,1) T7:(0,1,1,0) T8:(0,1,1,1)
+  T9:(1,0,0,0) T10:(1,0,0,1) T11:(1,0,1,0) T12:(1,0,1,1)
+  T13:(1,1,0,0) T14:(1,1,0,1) T15:(1,1,1,0) T16:(1,1,1,1)
+
+  For each: evaluate A for ALL assignments in {0,1}. If A holds
+  universally, evaluate B. A holds but B fails → FALSE, stop.
+  A fails → skip. ALL 16 checked unless FALSE found first.
+  After all 16 pass → proceed to Stage 1D.
+
+STAGE 1D — SIZE-3 MODULAR MAGMAS (mandatory before Phase 2):
+  Covers ~1% of falsifiable cases beyond size-2. Run all three.
+  For n variables: test all 3^n assignments.
+
+  Z3-Add : a◇b=(a+b) mod 3 → table [[0,1,2],[1,2,0],[2,0,1]]
+  Z3-Neg : a◇b=(-a-b) mod 3 → table [[0,2,1],[2,1,0],[1,0,2]]
+  Z3-Sub : a◇b=(a-b) mod 3 → table [[0,2,1],[1,0,2],[2,1,0]]
+
+  For each: if A holds for ALL assignments AND B fails for some
+  → VERDICT: FALSE. Stop. After all three pass → proceed to Stage 1E.
+
+  AUSTIN IMPLICATION WARNING: Some equations appear TRUE for ALL
+  finite models but are FALSE over infinite magmas (Austin laws,
+  Blueprint Chapter 5). If all finite tests pass but Step E proof
+  fails, do NOT default to TRUE. Suspect Austin implication when:
+  - A is V1 or V2 (identity law with complex E), AND
+  - Only projection-type models satisfy A in finite testing, AND
+  - No Step E proof is found.
+  In these cases Stage 1E is the deciding test.
+
+STAGE 1E — STRUCTURAL TERM CHECK (run if Stages 1B-1D all pass):
+  Purpose: detect Austin implications — FALSE over infinite magmas
+  even though all finite models pass.
+
+  Method: in the free magma on generators mod A, two terms are equal
+  iff A's rewriting rule can transform one into the other.
+  Apply A's rewriting rule exhaustively to both sides of B.
+  If reduced LHS_B and reduced RHS_B are structurally different
+  term-trees that A cannot equate → VERDICT: FALSE (infinite
+  free-magma counterexample exists).
+  Only proceed to Phase 2 if both sides reduce to the same term.
+
+  !! A's rule fires ONLY when a subterm EXACTLY matches the pattern
+     on one side of A. If no subterm matches, the term is irreducible.
+     Different irreducible trees = structural non-identity = FALSE.
+
+━━━ PHASE 2 — PROOF ATTEMPT (only if Phase 1 fully failed) ━━━━
+
+
+STEP A — TRIVIAL CHECKS:
+
+  PC1 SINGLETON — EXTENDED:
+    A forces a singleton magma under ANY of these patterns:
+
+    Type 1 : A has form x = y  (all vars distinct, no self-ref)
+    Type 2 : A has form x = y◇z  (all vars distinct, no self-ref)
+    Type 3 : A has form x = E  where x does NOT appear anywhere
+             in E (x is present on LHS only, absent from entire RHS)
+             regardless of how simple or complex E is.
+             Examples:
+               x = y◇((z◇(z◇y))◇y)   ← x absent from RHS
+               x = (y◇y)◇((y◇z)◇w)   ← x absent from RHS
+               x = y◇(z◇((w◇u)◇u))   ← x absent from RHS
+             Proof: A holds for ALL x but E depends only on other
+             vars, so E must equal every value of x simultaneously.
+             Only possible if all elements are equal (singleton).
+
+    In ALL singleton cases → every B holds trivially.
+    VERDICT: TRUE. Stop.
+
+    !! Do NOT confuse with V1/V2: those have x on BOTH sides
+       (x=E◇x or x=x◇E). PC1 Type 3 has x on LHS ONLY.
+
+  PC2 TAUTOLOGY : B has identical LHS and RHS → VERDICT: TRUE.
+  PC3 IDENTITY  : B is A with vars renamed (V4) or sides swapped
+                  → VERDICT: TRUE.
+
+STEP B — STRUCTURE ANALYSIS:
+  Extract from both A and B: [1] phantom variables (ONE side only),
+  [2] max nesting depth, [3] shape type. Compare before substituting.
+
+  PHANTOM SELF-APPLICATION WARNING:
+    If B contains a variable z appearing ONLY as z◇z (phantom
+    self-application), then B requires (expr)◇(z◇z) to equal
+    the same value for ALL possible z. This means either z◇z is
+    constant in the magma, OR (expr)◇c is the same for all
+    achievable self-products c. This is a strong additional
+    constraint. Do NOT assume it follows from A without explicit
+    derivation. If Phase 1 found no counterexample but this
+    pattern is present in B and A does not clearly imply it →
+    be extremely cautious before concluding TRUE.
+
+STEP C — RULE MATCHING:
+  Match A to exactly one of these patterns:
+
+  F1 Constant Collapse  : vars(LHS)∩vars(RHS)=∅
+     → all outputs constant. TRUE for almost any B.
+  F2 Left Projection    : LHS=x◇y, RHS has ONLY x
+     OR x=x◇y where y is STANDALONE only.
+     → a◇b=a universally. A◇B simplifies to A.
+     !! Must hold for ALL inputs. Complex RHS → V2 not F2.
+  F3 Right Projection   : LHS=x◇y, RHS has ONLY y
+     OR x=y◇x where y is STANDALONE only.
+     → a◇b=b universally. A◇B simplifies to B.
+     !! Must hold for ALL inputs. Complex E → V1 not F3.
+     Note: F2+F3 → F1.
+  F4 Absorption         : x◇(x◇y)=x or (x◇y)◇x=x
+     → collapse nested terms to single variable.
+  V1 Left Identity      : x=E◇x, E complex, no x in E
+     → E◇v=v for all v. Cancel ONLY exact prefix matches.
+     !! Does NOT imply global projection.
+  V2 Right Identity     : x=x◇E, E complex
+     → v◇E=v for all v. Cancel ONLY exact suffix matches.
+     !! Does NOT imply global projection.
+     V2 SCOPE LIMIT: E is right neutral at outermost level ONLY.
+     Do NOT cancel E from inside nested expressions. If B requires
+     repeated ◇ applications where no right operand matches E's
+     exact form → likely FALSE. Verify via Stage 1E.
+  V3 Twisted Comm       : x◇y=(y◇x)◇(y◇x)
+     → weak alone. Only useful with R3/F1.
+
+STEP D — TIER COMPARISON:
+  TIER 1 : vars(LHS)∩vars(RHS)=∅ OR singleton-forcing
+  TIER 2 : 1+ phantom var OR clean F2/F3 OR identity depth≤2
+  TIER 3 : no phantoms, commutativity-like, mixed identity depth 2-3
+  TIER 4 : all vars shared, depth≥3, no clean pattern
+
+  Tier(A) > Tier(B) → FALSE
+  Tier(A) = Tier(B) → must complete Step E
+  Tier(A) < Tier(B) → attempt Step E
+  !! "Likely TRUE" from tier is NOT a verdict. Must complete Step E.
+
+STEP E — SUBSTITUTION PROOF:
+  Attempt to rewrite B's LHS → B's RHS using A as rewrite rule.
+
+  STRICT RULES — violation of any rule = proof is invalid:
+    SR1 : Only substitute on EXACT structural matches. Not similar.
+    SR2 : Do NOT introduce variable relationships not present in A.
+    SR3 : Do NOT assume x◇x=y◇y (R6).
+    SR4 : Do NOT assume commutativity x◇y=y◇x.
+    SR5 : Do NOT assume associativity (x◇y)◇z=x◇(y◇z).
+    SR6 : Do NOT simplify by pattern similarity alone.
+    SR7 : Every single step must be explicitly justified by A.
+    SR8 : If any step feels forced or unclear → proof is invalid.
+          Return to Phase 1 and try harder counterexample.
+
+  Proof is valid ONLY if:
+    - Every step cites a specific part of A
+    - No step introduces new equalities
+    - The chain is complete with no gaps
+    - B's LHS transforms to B's RHS with no ambiguity
+
+  Incomplete proof = no proof = do NOT output TRUE.
+
+ADDITIONAL REDUCTION RULES (use in Step E only):
+  R1 Phantom    : Phantom var → substitute freely.
+  R2 Depth      : depth(A)>depth(B) → lean FALSE.
+                  depth(A)<depth(B) → lean TRUE but verify.
+  R3 Diagonal   : x◇x=[no x on RHS] → all self-apps equal.
+  R4 Partial    : Partial collapse does NOT guarantee implication.
+  R5 Idempotence: If A implies x◇x=E → (x◇x)◇(x◇x)=x◇x.
+                  Only use if explicitly implied by A.
+  R6 Square     : x◇x ≠ y◇y unless derivable from A.
+  V4 Rename     : Normalize var names. Apply before Step C and D.
+  H5 Structure  : B introduces new nesting not reducible from A
+                  → likely FALSE.
+  H6 Forcing    : Feeling of forcing = proof is wrong. Stop.
+  H7 New-Var-Interaction: B introduces variable pairings not
+     appearing in A (especially in reversed order) → strong signal
+     for FALSE. Run Stage 1E before concluding.
+
+━━━ FINAL DECISION GATE ━━━
+
+  TRUE  requires : Phase 1 fully exhausted (all 16 size-2 tables
+                   AND all 3 size-3 Z3 tables AND Stage 1E pass)
+                   AND complete valid Step E proof chain.
+  FALSE requires : one explicit table from Phase 1 where A holds
+                   and B fails, OR Stage 1A balance check fires,
+                   OR Stage 1E finds structural non-identity.
+  If Phase 1 finds no counterexample AND Step E proof is incomplete
+  → Stage 1E result determines verdict (non-identity → FALSE).
+  Do NOT default to TRUE because proof almost works.
+  Do NOT default to FALSE because counterexample was not found.
+
+═══ OUTPUT FORMAT (exact headers, no deviation) ═══
+
+VERDICT: TRUE or FALSE
+REASONING: [which steps were decisive]
+PROOF: [substitution chain if TRUE, else empty]
+COUNTEREXAMPLE: [explicit magma + values if FALSE, else empty;
+                  if infinite CE: describe the term-tree distinction]
