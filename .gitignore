@@ -1,0 +1,15 @@
+# Ignore large datasets (if needed)
+data/
+datasets/
+*.zip
+*.tar.gz
+
+# Environment files
+.env
+
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
